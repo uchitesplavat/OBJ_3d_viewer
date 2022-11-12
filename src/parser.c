@@ -8,9 +8,11 @@ data parser(char *argv) {
     FILE *file;
     unsigned int vert;
     unsigned int face;
+    d.polygons.vertexes = calloc(4096, sizeof(double));
     count_of_vertexes_and_facets(argv);
     vert = c.count_of_vertexes;
     face = c.count_of_facets;
+    int i = 1;
     if (s21_create_matrix(vert, &A)) {
         printf("create matrix faild\n");
     } else {
@@ -18,7 +20,9 @@ data parser(char *argv) {
             while (feof(file) == 0) {
                 if (fgets (str, 4096, file)!=NULL) {
                     if (check_string(str) == V_MARK) {
-
+                        sscanf( str, "%f %f %f", d.matrix_3d.matrix[i][0], d.matrix_3d.matrix[i][1], 
+                        d.matrix_3d.matrix[i][2]);
+                        i++;
                     } else if (check_string(str) == F_MARK) {
                         
                     }

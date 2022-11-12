@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define isspace(c) (c) == ' '
 
 typedef enum type_t {
   	F_MARK = 1,

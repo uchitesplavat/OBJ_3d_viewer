@@ -2,10 +2,21 @@
 #include <stdlib.h>
 
 typedef enum type_t {
-  F_MARK = 1,
-  V_MARK = 2,
-  ANOTHER = 3
+  	F_MARK = 1,
+  	V_MARK = 2,
+  	ANOTHER = 3,
+  	OK = 0,
+	INCORRECT_MATRIX = 1,
+	CALC_ERROR = 2,
+	MALLOC_FAILED = 3
 } type_t;
+
+// typedef enum type_t {
+// 	OK = 0;
+// 	INCORRECT_MATRIX = 1;
+// 	CALC_ERROR = 2;
+// 	MALLOC_FAILED = 3;
+// } type_t;
 
 typedef struct Matrix {
 	double **matrix;
@@ -19,14 +30,19 @@ typedef struct facets {
 } polygon_t;
 
 typedef struct data {
-	int count_of_vertexes;
-	int count_of_facets;
 	matrix_t matrix_3d;
 	polygon_t *polygons;
 } data;
 
+typedef struct count {
+	unsigned int count_of_vertexes;
+	unsigned int count_of_facets;
+	int error_mark;
+} count;
+
 data parser(char *argv);
 int check_string(char *str);
-
+count count_of_vertexes_and_facets(char *argv);
+int s21_create_matrix(const int rows, matrix_t *result);
 
 

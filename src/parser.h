@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE 4096
 #define isspace(c) (c) == ' '
 
 typedef enum type_t {
@@ -35,6 +36,8 @@ typedef struct facets {
 typedef struct data {
 	matrix_t matrix_3d;
 	polygon_t *polygons;
+	unsigned int count_of_vert; // remove later for tests
+	unsigned int count_of_face; // remove later for tests
 } data;
 
 typedef struct count {
@@ -43,9 +46,9 @@ typedef struct count {
 	int error_mark;
 } count;
 
-data parser(char *argv);
+data parser(char* fileName);
 int check_string(char *str);
-count count_of_vertexes_and_facets(char *argv);
+count count_of_vertexes_and_facets(char* fileName);
 int s21_create_matrix(const int rows, matrix_t *result);
 
 

@@ -1,38 +1,54 @@
 #include "parser.h"
 
-data parser(char *argv) {
+int main() {
+    // int fg = argc;
     data d = {0};
     count c = {0};
+    d = parser("cube.obj");
+    for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
+        printf("%f ", d.matrix_3d.matrix[i][0]);
+        printf("%f ", d.matrix_3d.matrix[i][1]);
+        printf("%f\n", d.matrix_3d.matrix[i][2]);
+    }
+    return 0;
+}
+
+data parser(char* fileName) {
+    char v;
+    data d = {0};
     matrix_t A = {0};
-    char str[4096];
+    char *str = calloc(BUFFER_SIZE, sizeof(char));;
     FILE *file;
     unsigned int vert;
     unsigned int face;
-    d.polygons.vertexes = calloc(4096, sizeof(double));
-    count_of_vertexes_and_facets(argv);
-    vert = c.count_of_vertexes;
-    face = c.count_of_facets;
+    // d.polygons.vertexes = calloc(4096, sizeof(double));
+    count c = count_of_vertexes_and_facets(fileName);
+    d.count_of_vert = c.count_of_vertexes;
+    printf("%d\n", c.count_of_vertexes);
+    d.count_of_face = c.count_of_facets;
     int i = 1;
-    if (s21_create_matrix(vert, &A)) {
+    if (s21_create_matrix(d.count_of_vert, &d.matrix_3d)) {
         printf("create matrix faild\n");
     } else {
-        if ((file = fopen(argv, "r")) != NULL) {
+        if ((file = fopen(fileName, "r")) != NULL) {
             while (feof(file) == 0) {
-                if (fgets (str, 4096, file)!=NULL) {
+                if (fgets (str, BUFFER_SIZE, file)!=NULL) {
+                    printf("%s", str);
                     if (check_string(str) == V_MARK) {
-                        sscanf( str, "%f %f %f", d.matrix_3d.matrix[i][0], d.matrix_3d.matrix[i][1], 
-                        d.matrix_3d.matrix[i][2]);
+                        sscanf(str, "%c %lf %lf %lf", &v, &d.matrix_3d.matrix[i][0], &d.matrix_3d.matrix[i][1], 
+                        &d.matrix_3d.matrix[i][2]);
                         i++;
                     } else if (check_string(str) == F_MARK) {
-                        
+
                     }
                 }
             }
+        fclose(file);
         } else {
             printf("file not found\n");
         }
     }
-    fclose(file);
+    return d;
 }
 
 // check string first simbol "f" or "v" in .obj return 1 or 2 and retern 3 for other 
@@ -51,19 +67,21 @@ int check_string(char *str) {
 
 // count vertexes and facets for easy memory work
 
-count count_of_vertexes_and_facets(char *argv) {
+count count_of_vertexes_and_facets(char* fileName) {
     count count = {0};
     unsigned int vert = 0;
     unsigned int face = 0;
     char str[4096];
     FILE *file;
-    if ((file = fopen(argv, "r")) != NULL) {
+    if ((file = fopen(fileName, "r")) != NULL) {
         while (feof(file) == 0) {
             if (fgets (str, 4096, file)!=NULL) {
                 if (str[0] == 'v') {
                     count.count_of_vertexes++;
+                    printf("%d\n", count.count_of_vertexes);
                 } else if (str[0] == 'f') {
                     count.count_of_facets++;
+                    printf("%d\n", count.count_of_facets);
                 }
             }
         }
@@ -72,6 +90,7 @@ count count_of_vertexes_and_facets(char *argv) {
         printf("file not found\n");
     }
     fclose(file);
+    return count;
 }
 
 int s21_create_matrix(const int rows, matrix_t *result) {

@@ -34,10 +34,15 @@ data parser(char* fileName) {
   d.polygons = calloc(c.count_of_facets + 1, sizeof(polygon_t));
   int i = 1;
   if (s21_create_matrix(c.count_of_vertexes, &d.matrix_3d)) {
-    printf("create matrix faild\n");
+    printf("create matrix failed\n");
   } else {
-    if ((file = fopen(fileName, "r")) != NULL) {
+    if ((file = file_open(fileName)) != NULL) {
+        unsigned long size = file_size(file);
+//        void* dst = calloc(size + 1, sizeof(void)); // mem for whole .obj file
+//        char * buffer = (char*) malloc(sizeof(char) * lSize)
+        printf("file size ====== %ld\n", size);
       int counter_polygons = 1;
+//      file_read(file, dst, size)
       while (feof(file) == 0) {
         if (fgets(str, BUFFER_SIZE, file) != NULL) {
           if (check_string(str) == V_MARK) {  // check V line
@@ -49,11 +54,11 @@ data parser(char* fileName) {
             ++str;
             str = skip_whitespace(str);
             d.polygons[counter_polygons].vertexes =
-                calloc(c.count_of_lines_for_memory * 10, sizeof(int));
+                calloc(size/100, sizeof(int));
             d.polygons[counter_polygons].tex =
-                calloc(c.count_of_lines_for_memory * 10, sizeof(int));
+                calloc(size/100, sizeof(int));
             d.polygons[counter_polygons].normals =
-                calloc(c.count_of_lines_for_memory * 10, sizeof(int));
+                calloc(size/100, sizeof(int));
             while (!is_newline(*str)) {
               int v = 0;
               int t = 0;
@@ -93,7 +98,7 @@ data parser(char* fileName) {
           }
         }
       }
-      fclose(file);
+        file_close(file);
     } else {
       printf("file not found\n");
     }
@@ -101,7 +106,7 @@ data parser(char* fileName) {
   return d;
 }
 
-// check string first simbol "f" or "v" in .obj return 1 or 2 and retern 3 for
+// check string first symbol "f" or "v" in .obj return 1 or 2 and return 3 for
 // other
 
 int check_string(const char* str) {
@@ -118,14 +123,14 @@ int check_string(const char* str) {
 
 // count vertexes and facets for easy memory work
 
-count count_of_vertexes_and_facets(char* fileName) {
+count count_of_vertexes_and_facets(const char* fileName) {
   count count = {0};
   count.count_of_lines_for_memory = 0;
-  char str[4096];
   FILE* file;
-  if ((file = fopen(fileName, "r")) != NULL) {
+  if ((file = file_open(fileName)) != NULL) {
     while (feof(file) == 0) {
-      if (fgets(str, 4096, file) != NULL) {
+        char *str = calloc(BUFFER_SIZE, sizeof(char));
+      if (fgets(str, BUFFER_SIZE, file) != NULL) {
         if (str[0] == 'v' && str[1] != 'n' && str[1] != 't') {
           count.count_of_vertexes++;
         } else if (str[0] == 'f') {
@@ -133,12 +138,12 @@ count count_of_vertexes_and_facets(char* fileName) {
         }
         count.count_of_lines_for_memory++;
       }
+      free (str);
     }
-
+      file_close(file);
   } else {
     printf("file not found\n");
   }
-  fclose(file);
   return count;
 }
 
@@ -163,6 +168,37 @@ int s21_create_matrix(const int rows, matrix_t* result) {
   }
 
   return (ret_code);
+}
+
+void* file_open(const char* path) {
+    return fopen(path, "rb");
+}
+
+size_t file_read(void* file, void* dst, size_t bytes) {
+    FILE* f;
+    f = (FILE*)(file);
+    return fread(dst, 1, bytes, f);
+}
+
+unsigned long file_size(void* file) {
+    FILE* f;
+    long p;
+    long n;
+    f = (FILE*)(file);
+    p = ftell(f);
+    fseek(f, 0, SEEK_END);
+    n = ftell(f);
+    fseek(f, p, SEEK_SET);
+    if (n > 0)
+        return (unsigned long)(n);
+    else
+        return 0;
+}
+
+void file_close(void* file) {
+    FILE* f;
+    f = (FILE*)file;
+    fclose(f);
 }
 
 int is_newline(char c) { return (c == '\n'); }

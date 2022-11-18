@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_SIZE 6000000
+#define BUFFER_SIZE 1000000
 #define isspace(c) (c) == ' '
 
 typedef enum type_t {
@@ -52,10 +52,14 @@ typedef struct count {
 
 data parser(char* fileName);
 int check_string(const char* str);
-count count_of_vertexes_and_facets(char* fileName);
+count count_of_vertexes_and_facets(const char* fileName);
 int s21_create_matrix(const int rows, matrix_t* result);
 const char* parse_int(const char* ptr, int* val);
 int is_whitespace(char c);
 int is_newline(char c);
 const char* skip_whitespace(const char* ptr);
 int is_digit(char c);
+unsigned long file_size(void* file);
+size_t file_read(void* file, void* dst, size_t bytes);
+void file_close(void* file);
+void* file_open(const char* path);

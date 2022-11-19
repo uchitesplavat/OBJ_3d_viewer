@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_SIZE 1000000
+#define BUFFER_SIZE 70000
 #define isspace(c) (c) == ' '
 
 typedef enum type_t {
@@ -63,3 +63,8 @@ unsigned long file_size(void* file);
 size_t file_read(void* file, void* dst, size_t bytes);
 void file_close(void* file);
 void* file_open(const char* path);
+void* memory_realloc(void* ptr, size_t bytes);
+void memory_dealloc_char(const char* ptr);
+void memory_dealloc_double(double* ptr);
+void memory_dealloc_int(int* ptr);
+void memory_dealloc_polygon_t(polygon_t* ptr);

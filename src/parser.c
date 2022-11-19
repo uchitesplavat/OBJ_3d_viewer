@@ -2,7 +2,7 @@
 
 int main() {
   data d = {0};
-  d = parser("models/Gun.obj");
+  d = parser("models/City.obj");
   for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
     printf("%f ", d.matrix_3d.matrix[i][0]);
     printf("%f ", d.matrix_3d.matrix[i][1]);
@@ -20,30 +20,48 @@ int main() {
       }
     }
   }
+  for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
+    memory_dealloc_double(d.matrix_3d.matrix[i]);
+  }
+  //  for (int k = 1; k < d.count_polygons + 1; k++) {
+  //      for (int g = 1; g < d.polygons[k].numbers_of_vertexes_in_facets + 1;
+  //      g++) {
+  //          memory_dealloc_int(&d.polygons[k].vertexes[g]);
+  //          memory_dealloc_int(&d.polygons[k].tex[g]);               // FIX
+  //          IT!!!!!!!!!!!! memory_dealloc_int(&d.polygons[k].normals[g]);
+  //      }
+  //  }
+
+  memory_dealloc_polygon_t(d.polygons);
   return 0;
 }
 
 data parser(char* fileName) {
   char e;
   data d = {0};
-  const char* str = calloc(BUFFER_SIZE, sizeof(char));
+  //  const char* str = calloc(BUFFER_SIZE, sizeof(char));
+  const char* str = (char*)(memory_realloc(0, 2 * BUFFER_SIZE * sizeof(char)));
+  const char* tmp = str;
   FILE* file;
   count c = count_of_vertexes_and_facets(fileName);
   d.count_of_vert = c.count_of_vertexes;
   d.count_of_face = c.count_of_facets;
-  d.polygons = calloc(c.count_of_facets + 1, sizeof(polygon_t));
+  d.polygons = (polygon_t*)(memory_realloc(0, 2 * 2000000 * sizeof(polygon_t)));
+  //  d.polygons = calloc(c.count_of_facets + 1, sizeof(polygon_t));
   int i = 1;
   if (s21_create_matrix(c.count_of_vertexes, &d.matrix_3d)) {
     printf("create matrix failed\n");
   } else {
     if ((file = file_open(fileName)) != NULL) {
-        unsigned long size = file_size(file);
-//        void* dst = calloc(size + 1, sizeof(void)); // mem for whole .obj file
-//        char * buffer = (char*) malloc(sizeof(char) * lSize)
-        printf("file size ====== %ld\n", size);
+      unsigned long size = file_size(file);
+      //        void* dst = calloc(size + 1, sizeof(void)); // mem for whole
+      //        .obj file char * buffer = (char*) malloc(sizeof(char) * lSize)
+      printf("file size ====== %ld\n", size);
       int counter_polygons = 1;
-//      file_read(file, dst, size)
+      int counter = 0;
+      //      file_read(file, dst, size)
       while (feof(file) == 0) {
+        //          printf("count of while === %d\n", counter_polygons++);
         if (fgets(str, BUFFER_SIZE, file) != NULL) {
           if (check_string(str) == V_MARK) {  // check V line
             sscanf(str, "%c %lf %lf %lf", &e, &d.matrix_3d.matrix[i][0],
@@ -54,11 +72,17 @@ data parser(char* fileName) {
             ++str;
             str = skip_whitespace(str);
             d.polygons[counter_polygons].vertexes =
-                calloc(size/100, sizeof(int));
+                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
             d.polygons[counter_polygons].tex =
-                calloc(size/100, sizeof(int));
+                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
             d.polygons[counter_polygons].normals =
-                calloc(size/100, sizeof(int));
+                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
+            //            d.polygons[counter_polygons].vertexes =
+            //                calloc(size/100, sizeof(int));
+            //            d.polygons[counter_polygons].tex =
+            //                calloc(size/100, sizeof(int));
+            //            d.polygons[counter_polygons].normals =
+            //                calloc(size/100, sizeof(int));
             while (!is_newline(*str)) {
               int v = 0;
               int t = 0;
@@ -97,8 +121,10 @@ data parser(char* fileName) {
             counter_polygons++;
           }
         }
+        str = tmp;
       }
-        file_close(file);
+      file_close(file);
+      memory_dealloc_char(str);
     } else {
       printf("file not found\n");
     }
@@ -129,7 +155,7 @@ count count_of_vertexes_and_facets(const char* fileName) {
   FILE* file;
   if ((file = file_open(fileName)) != NULL) {
     while (feof(file) == 0) {
-        char *str = calloc(BUFFER_SIZE, sizeof(char));
+      char* str = calloc(BUFFER_SIZE, sizeof(char));
       if (fgets(str, BUFFER_SIZE, file) != NULL) {
         if (str[0] == 'v' && str[1] != 'n' && str[1] != 't') {
           count.count_of_vertexes++;
@@ -138,9 +164,9 @@ count count_of_vertexes_and_facets(const char* fileName) {
         }
         count.count_of_lines_for_memory++;
       }
-      free (str);
+      free(str);
     }
-      file_close(file);
+    file_close(file);
   } else {
     printf("file not found\n");
   }
@@ -170,35 +196,33 @@ int s21_create_matrix(const int rows, matrix_t* result) {
   return (ret_code);
 }
 
-void* file_open(const char* path) {
-    return fopen(path, "rb");
-}
+void* file_open(const char* path) { return fopen(path, "rb"); }
 
 size_t file_read(void* file, void* dst, size_t bytes) {
-    FILE* f;
-    f = (FILE*)(file);
-    return fread(dst, 1, bytes, f);
+  FILE* f;
+  f = (FILE*)(file);
+  return fread(dst, 1, bytes, f);
 }
 
 unsigned long file_size(void* file) {
-    FILE* f;
-    long p;
-    long n;
-    f = (FILE*)(file);
-    p = ftell(f);
-    fseek(f, 0, SEEK_END);
-    n = ftell(f);
-    fseek(f, p, SEEK_SET);
-    if (n > 0)
-        return (unsigned long)(n);
-    else
-        return 0;
+  FILE* f;
+  long p;
+  long n;
+  f = (FILE*)(file);
+  p = ftell(f);
+  fseek(f, 0, SEEK_END);
+  n = ftell(f);
+  fseek(f, p, SEEK_SET);
+  if (n > 0)
+    return (unsigned long)(n);
+  else
+    return 0;
 }
 
 void file_close(void* file) {
-    FILE* f;
-    f = (FILE*)file;
-    fclose(f);
+  FILE* f;
+  f = (FILE*)file;
+  fclose(f);
 }
 
 int is_newline(char c) { return (c == '\n'); }
@@ -230,3 +254,13 @@ const char* parse_int(const char* ptr, int* val) {
 
   return ptr;
 }
+
+void* memory_realloc(void* ptr, size_t bytes) { return realloc(ptr, bytes); }
+
+void memory_dealloc_char(const char* ptr) { free(ptr); }
+
+void memory_dealloc_int(int* ptr) { free(ptr); }
+
+void memory_dealloc_double(double* ptr) { free(ptr); }
+
+void memory_dealloc_polygon_t(polygon_t* ptr) { free(ptr); }

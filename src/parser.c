@@ -20,17 +20,17 @@ int main() {
       }
     }
   }
-  for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
-    memory_dealloc_double(d.matrix_3d.matrix[i]);
-  }
-  //  for (int k = 1; k < d.count_polygons + 1; k++) {
-  //      for (int g = 1; g < d.polygons[k].numbers_of_vertexes_in_facets + 1;
-  //      g++) {
-  //          memory_dealloc_int(&d.polygons[k].vertexes[g]);
-  //          memory_dealloc_int(&d.polygons[k].tex[g]);               // FIX
-  //          IT!!!!!!!!!!!! memory_dealloc_int(&d.polygons[k].normals[g]);
-  //      }
-  //  }
+//  for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
+//    memory_dealloc_double(d.matrix_3d.matrix[i]);
+//  }
+//    for (int k = 1; k < d.count_polygons + 1; k++) {
+//        for (int g = 1; g < d.polygons[k].numbers_of_vertexes_in_facets + 1;
+//        g++) {
+//            memory_dealloc_int(&d.polygons[k].vertexes[g]);
+//            memory_dealloc_int(&d.polygons[k].tex[g]);
+//            memory_dealloc_int(&d.polygons[k].normals[g]);
+//        }
+//    }
 
   memory_dealloc_polygon_t(d.polygons);
   return 0;
@@ -46,7 +46,7 @@ data parser(char* fileName) {
   count c = count_of_vertexes_and_facets(fileName);
   d.count_of_vert = c.count_of_vertexes;
   d.count_of_face = c.count_of_facets;
-  d.polygons = (polygon_t*)(memory_realloc(0, 2 * 2000000 * sizeof(polygon_t)));
+//  d.polygons = (polygon_t*)(memory_realloc(0, 2 * BUFFER_SIZE * sizeof(polygon_t)));
   //  d.polygons = calloc(c.count_of_facets + 1, sizeof(polygon_t));
   int i = 1;
   if (s21_create_matrix(c.count_of_vertexes, &d.matrix_3d)) {
@@ -54,6 +54,7 @@ data parser(char* fileName) {
   } else {
     if ((file = file_open(fileName)) != NULL) {
       unsigned long size = file_size(file);
+      d.polygons = (polygon_t*)(memory_realloc(0, size/10 * sizeof(polygon_t)));
       //        void* dst = calloc(size + 1, sizeof(void)); // mem for whole
       //        .obj file char * buffer = (char*) malloc(sizeof(char) * lSize)
       printf("file size ====== %ld\n", size);
@@ -72,11 +73,11 @@ data parser(char* fileName) {
             ++str;
             str = skip_whitespace(str);
             d.polygons[counter_polygons].vertexes =
-                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
+                (int*)(memory_realloc(0, size / 30 * sizeof(int)));
             d.polygons[counter_polygons].tex =
-                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
+                (int*)(memory_realloc(0, size / 30 * sizeof(int)));
             d.polygons[counter_polygons].normals =
-                (int*)(memory_realloc(0, size / 3 * sizeof(int)));
+                (int*)(memory_realloc(0, size / 30 * sizeof(int)));
             //            d.polygons[counter_polygons].vertexes =
             //                calloc(size/100, sizeof(int));
             //            d.polygons[counter_polygons].tex =

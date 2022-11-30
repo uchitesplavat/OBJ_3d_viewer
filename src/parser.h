@@ -5,6 +5,10 @@
 #define BUFFER_SIZE 70000
 #define isspace(c) (c) == ' '
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum type_t {
   F_MARK = 1,
   V_MARK = 2,
@@ -51,20 +55,22 @@ typedef struct count {
 } count;
 
 data parser(char* fileName);
-int check_string(const char* str);
+data case_F(char* str, struct data d, int counter_polygons);
+int check_string(char* str);
 count count_of_vertexes_and_facets(const char* fileName);
 int s21_create_matrix(const int rows, matrix_t* result);
-const char* parse_int(const char* ptr, int* val);
+char* parse_int(char* ptr, int* val);
 int is_whitespace(char c);
 int is_newline(char c);
-const char* skip_whitespace(const char* ptr);
+char* skip_whitespace(char* ptr);
 int is_digit(char c);
 unsigned long file_size(void* file);
 size_t file_read(void* file, void* dst, size_t bytes);
 void file_close(void* file);
 void* file_open(const char* path);
 void* memory_realloc(void* ptr, size_t bytes);
-void memory_dealloc_char(const char* ptr);
+void memory_dealloc_char(char* ptr);
 void memory_dealloc_double(double* ptr);
 void memory_dealloc_int(int* ptr);
 void memory_dealloc_polygon_t(polygon_t* ptr);
+void s21_remove_matrix(matrix_t* const A);

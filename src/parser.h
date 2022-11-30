@@ -6,25 +6,18 @@
 #define isspace(c) (c) == ' '
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
 #endif
 
-typedef enum type_t {
-  F_MARK = 1,
-  V_MARK = 2,
-  ANOTHER = 3,
-  OK = 0,
-  INCORRECT_MATRIX = 1,
-  CALC_ERROR = 2,
-  MALLOC_FAILED = 3
-} type_t;
-
-// typedef enum type_t {
-// 	OK = 0;
-// 	INCORRECT_MATRIX = 1;
-// 	CALC_ERROR = 2;
-// 	MALLOC_FAILED = 3;
-// } type_t;
+    typedef enum type_t {
+      F_MARK = 1,
+      V_MARK = 2,
+      ANOTHER = 3,
+      OK = 0,
+      INCORRECT_MATRIX = 1,
+      CALC_ERROR = 2,
+      MALLOC_FAILED = 3
+    } type_t;
 
 typedef struct Matrix {
   double** matrix;

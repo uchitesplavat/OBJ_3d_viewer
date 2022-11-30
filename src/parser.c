@@ -49,7 +49,8 @@ data parser(char* fileName) {
   } else {
     if ((file = file_open(fileName)) != NULL) {
       unsigned long size = file_size(file);
-      d.polygons = (memory_realloc(d.polygons, size / 10 * sizeof(polygon_t)));
+      d.polygons = (memory_realloc(d.polygons,
+                                   c.count_of_facets * 2 * sizeof(polygon_t)));
       printf("file size ====== %ld\n", size);
       int counter_polygons = 1;
       //      file_read(file, dst, size)

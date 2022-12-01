@@ -4,6 +4,7 @@
 
 #define BUFFER_SIZE 70000
 #define isspace(c) (c) == ' '
+#define MAX_POWER 20
 
 #ifdef __cplusplus
 extern "C"
@@ -49,6 +50,8 @@ typedef struct count {
 
 data parser(char* fileName);
 data case_F(char* str, struct data d, int counter_polygons);
+char* parse_float_numbers_for_V(char* str, float* val);
+data parse_vertex(char* str, struct data d, int index_string_number);
 int check_string(char* str);
 count count_of_vertexes_and_facets(const char* fileName);
 int s21_create_matrix(const int rows, matrix_t* result);
@@ -61,6 +64,7 @@ unsigned long file_size(void* file);
 size_t file_read(void* file, void* dst, size_t bytes);
 void file_close(void* file);
 void* file_open(const char* path);
+int is_exponent(char c);
 void* memory_realloc(void* ptr, size_t bytes);
 void memory_dealloc_char(char* ptr);
 void memory_dealloc_double(double* ptr);

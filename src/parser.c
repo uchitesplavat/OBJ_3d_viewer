@@ -2,7 +2,9 @@
 
 int main() {
   data d = {0};
-  d = parser("models/City.obj");
+  char name[20] = "models/City.obj\000";
+  d = parser(name);
+
   for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
     printf("%f ", d.matrix_3d.matrix[i][0]);
     printf("%f ", d.matrix_3d.matrix[i][1]);
@@ -33,8 +35,20 @@ int main() {
   return 0;
 }
 
+double POWER_10_POSITIVE[MAX_POWER] = {
+    1.0e0,  1.0e1,  1.0e2,  1.0e3,  1.0e4,  1.0e5,  1.0e6,
+    1.0e7,  1.0e8,  1.0e9,  1.0e10, 1.0e11, 1.0e12, 1.0e13,
+    1.0e14, 1.0e15, 1.0e16, 1.0e17, 1.0e18, 1.0e19,
+};
+
+double POWER_10_NEGATIVE[MAX_POWER] = {
+    1.0e0,   1.0e-1,  1.0e-2,  1.0e-3,  1.0e-4,  1.0e-5,  1.0e-6,
+    1.0e-7,  1.0e-8,  1.0e-9,  1.0e-10, 1.0e-11, 1.0e-12, 1.0e-13,
+    1.0e-14, 1.0e-15, 1.0e-16, 1.0e-17, 1.0e-18, 1.0e-19,
+};
+
 data parser(char* fileName) {
-  char e;
+  //  char e;
   data d = {0};
   char* str = NULL;
   str = (memory_realloc(str, BUFFER_SIZE * sizeof(char)));
@@ -43,7 +57,7 @@ data parser(char* fileName) {
   count c = count_of_vertexes_and_facets(fileName);
   d.count_of_vert = c.count_of_vertexes;
   d.count_of_face = c.count_of_facets;
-  int i = 1;
+  int index_string_number = 1;
   if (s21_create_matrix(c.count_of_vertexes, &d.matrix_3d)) {
     printf("create matrix failed\n");
   } else {
@@ -58,9 +72,8 @@ data parser(char* fileName) {
         //          printf("count of while === %d\n", counter_polygons++);
         if (fgets(str, BUFFER_SIZE, file) != NULL) {
           if (check_string(str) == V_MARK) {  // check V line
-            sscanf(str, "%c %lf %lf %lf", &e, &d.matrix_3d.matrix[i][0],
-                   &d.matrix_3d.matrix[i][1], &d.matrix_3d.matrix[i][2]);
-            i++;
+            d = parse_vertex(str, d, index_string_number);
+            index_string_number++;
           } else if (check_string(str) == F_MARK) {  // check F line
             d = case_F(str, d, counter_polygons);
             counter_polygons++;
@@ -73,6 +86,78 @@ data parser(char* fileName) {
     } else {
       printf("file not found\n");
     }
+  }
+  return d;
+}
+
+char* parse_float_numbers_for_V(char* str, float* val) {
+  double sign;
+  double num;
+  double fra;
+  double div;
+  unsigned int eval;
+  const double* powers;
+
+  str = skip_whitespace(str);
+
+  switch (*str) {
+    case '+':
+      sign = 1.0;
+      str++;
+      break;
+
+    case '-':
+      sign = -1.0;
+      str++;
+      break;
+
+    default:
+      sign = 1.0;
+      break;
+  }
+  num = 0.0;
+  while (is_digit(*str)) num = 10.0 * num + (double)(*str++ - '0');
+  if (*str == '.') str++;
+  fra = 0.0;
+  div = 1.0;
+  while (is_digit(*str)) {
+    fra = 10.0 * fra + (double)(*str++ - '0');
+    div *= 10.0;
+  }
+  num += fra / div;
+  if (is_exponent(*str)) {
+    str++;
+
+    switch (*str) {
+      case '+':
+        powers = POWER_10_POSITIVE;
+        str++;
+        break;
+
+      case '-':
+        powers = POWER_10_NEGATIVE;
+        str++;
+        break;
+
+      default:
+        powers = POWER_10_POSITIVE;
+        break;
+    }
+    eval = 0;
+    while (is_digit(*str)) eval = 10 * eval + (*str++ - '0');
+    num *= (eval >= MAX_POWER) ? 0.0 : powers[eval];
+  }
+  *val = (float)(sign * num);
+  return str;
+}
+
+data parse_vertex(char* str, struct data d, int index_string_number) {
+  unsigned int i;
+  float v;
+  str++;
+  for (i = 0; i < 3; i++) {
+    str = parse_float_numbers_for_V(str, &v);
+    d.matrix_3d.matrix[index_string_number][i] = v;
   }
   return d;
 }
@@ -260,6 +345,8 @@ void s21_remove_matrix(matrix_t* const A) {
     A->cols = 0;
   }
 }
+
+int is_exponent(char c) { return (c == 'e' || c == 'E'); }
 
 void* memory_realloc(void* ptr, size_t bytes) { return realloc(ptr, bytes); }
 

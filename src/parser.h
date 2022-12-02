@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 // string size
 #define BUFFER_SIZE 70000
 #define isspace(c) (c) == ' '
@@ -40,13 +41,13 @@ typedef struct facets {
 } polygon_t;
 
 // main structure with V and F
-typedef struct data {
+typedef struct database {
   matrix_t matrix_3d;
   polygon_t* polygons;
   unsigned int count_of_vert;  // remove later for tests
   unsigned int count_of_face;  // remove later for tests
   int count_polygons;
-} data;
+} database;
 
 typedef struct count {
   unsigned int count_of_vertexes;
@@ -56,10 +57,10 @@ typedef struct count {
 } count;
 
 // psrser
-data parser(char* fileName);
-data case_F(char* str, struct data d, int counter_polygons);
+database parser(char* fileName);
+database case_F(char* str, struct database d, int counter_polygons);
 char* parse_float_numbers_for_V(char* str, float* val);
-data parse_vertex(char* str, struct data d, int index_string_number);
+database parse_vertex(char* str, struct database d, int index_string_number);
 int check_string(char* str);
 count count_of_vertexes_and_facets(const char* fileName);
 
@@ -87,4 +88,7 @@ void memory_dealloc_double(double* ptr);
 void memory_dealloc_int(int* ptr);
 void memory_dealloc_polygon_t(polygon_t* ptr);
 void s21_remove_matrix(matrix_t* const A);
-void free_polygons(struct data d);
+void free_polygons(struct database d);
+
+// helpers
+void array_of_coord(double* mas1, database matrix);

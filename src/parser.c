@@ -12,8 +12,8 @@ double POWER_10_NEGATIVE[MAX_POWER] = {
     1.0e-14, 1.0e-15, 1.0e-16, 1.0e-17, 1.0e-18, 1.0e-19,
 };
 
-data parser(char* fileName) {
-  data d = {0};
+database parser(char* fileName) {
+  database d = {0};
   char* str = NULL;
   str = (memory_realloc(str, BUFFER_SIZE * sizeof(char)));
   char* tmp = str;
@@ -112,7 +112,7 @@ char* parse_float_numbers_for_V(char* str, float* val) {
   return str;
 }
 
-data parse_vertex(char* str, struct data d, int index_string_number) {
+database parse_vertex(char* str, struct database d, int index_string_number) {
   unsigned int i;
   float v;
   str++;
@@ -123,7 +123,7 @@ data parse_vertex(char* str, struct data d, int index_string_number) {
   return d;
 }
 
-data case_F(char* str, struct data d, int counter_polygons) {
+database case_F(char* str, struct database d, int counter_polygons) {
   int count_vtn = 0;  // count v t n combination in one line
   ++str;
   str = skip_whitespace(str);
@@ -309,7 +309,7 @@ void s21_remove_matrix(matrix_t* const A) {
   }
 }
 
-void free_polygons(struct data d) {
+void free_polygons(struct database d) {
   for (int k = 1; k < d.count_polygons + 1; k++) {
     memory_dealloc_int(d.polygons[k].vertexes);
     memory_dealloc_int(d.polygons[k].tex);

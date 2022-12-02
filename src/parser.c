@@ -1,40 +1,5 @@
 #include "parser.h"
 
-int main() {
-  data d = {0};
-  char name[20] = "models/City.obj\000";
-  d = parser(name);
-
-  for (unsigned int i = 1; i < d.count_of_vert + 1; i++) {
-    printf("%f ", d.matrix_3d.matrix[i][0]);
-    printf("%f ", d.matrix_3d.matrix[i][1]);
-    printf("%f\n", d.matrix_3d.matrix[i][2]);
-  }
-
-  for (int k = 1; k < d.count_polygons + 1; k++) {
-    for (int g = 1; g < d.polygons[k].numbers_of_vertexes_in_facets + 1; g++) {
-      printf("%d ", d.polygons[k].vertexes[g]);
-      printf("%d ", d.polygons[k].tex[g]);
-      printf("%d ", d.polygons[k].normals[g]);
-
-      if (g == d.polygons[k].numbers_of_vertexes_in_facets) {
-        printf("\n");
-      }
-    }
-  }
-
-  s21_remove_matrix(&d.matrix_3d);
-
-  for (int k = 1; k < d.count_polygons + 1; k++) {
-    memory_dealloc_int(d.polygons[k].vertexes);
-    memory_dealloc_int(d.polygons[k].tex);
-    memory_dealloc_int(d.polygons[k].normals);
-  }
-
-  memory_dealloc_polygon_t(d.polygons);
-  return 0;
-}
-
 double POWER_10_POSITIVE[MAX_POWER] = {
     1.0e0,  1.0e1,  1.0e2,  1.0e3,  1.0e4,  1.0e5,  1.0e6,
     1.0e7,  1.0e8,  1.0e9,  1.0e10, 1.0e11, 1.0e12, 1.0e13,
@@ -48,7 +13,6 @@ double POWER_10_NEGATIVE[MAX_POWER] = {
 };
 
 data parser(char* fileName) {
-  //  char e;
   data d = {0};
   char* str = NULL;
   str = (memory_realloc(str, BUFFER_SIZE * sizeof(char)));
@@ -65,11 +29,8 @@ data parser(char* fileName) {
       unsigned long size = file_size(file);
       d.polygons = (memory_realloc(d.polygons,
                                    c.count_of_facets * 2 * sizeof(polygon_t)));
-      printf("file size ====== %ld\n", size);
       int counter_polygons = 1;
-      //      file_read(file, dst, size)
       while (feof(file) == 0) {
-        //          printf("count of while === %d\n", counter_polygons++);
         if (fgets(str, BUFFER_SIZE, file) != NULL) {
           if (check_string(str) == V_MARK) {  // check V line
             d = parse_vertex(str, d, index_string_number);
@@ -311,6 +272,8 @@ int is_whitespace(char c) { return (c == ' ' || c == '\t' || c == '\r'); }
 
 int is_digit(char c) { return (c >= '0' && c <= '9'); }
 
+int is_exponent(char c) { return (c == 'e' || c == 'E'); }
+
 char* skip_whitespace(char* ptr) {
   while (is_whitespace(*ptr)) ptr++;
 
@@ -346,7 +309,13 @@ void s21_remove_matrix(matrix_t* const A) {
   }
 }
 
-int is_exponent(char c) { return (c == 'e' || c == 'E'); }
+void free_polygons(struct data d) {
+  for (int k = 1; k < d.count_polygons + 1; k++) {
+    memory_dealloc_int(d.polygons[k].vertexes);
+    memory_dealloc_int(d.polygons[k].tex);
+    memory_dealloc_int(d.polygons[k].normals);
+  }
+}
 
 void* memory_realloc(void* ptr, size_t bytes) { return realloc(ptr, bytes); }
 

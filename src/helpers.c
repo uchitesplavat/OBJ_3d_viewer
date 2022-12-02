@@ -8,6 +8,16 @@ void array_of_coord(double* mas1, database matrix) {
                 mas1[n] = matrix.matrix_3d.matrix[matrix.polygons[i].vertexes[j]][k];
                 n++;
             }
+            if (j != 1) {
+                for (int k = 0; k < 3; k++) {
+                    mas1[n] = matrix.matrix_3d.matrix[matrix.polygons[i].vertexes[j]][k];
+                    n++;
+                }
+            }
+        }
+        for (int k = 0; k < 3; k++) {
+            mas1[n] = matrix.matrix_3d.matrix[matrix.polygons[i].vertexes[1]][k];
+            n++;
         }
     }
 }

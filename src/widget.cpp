@@ -2,7 +2,7 @@
 
 
 Widget::Widget(QWidget *parent)
-    : QOpenGLWidget(parent)
+        : QOpenGLWidget(parent)
 {
     setWindowTitle("The model");
 }
@@ -44,14 +44,22 @@ void Widget::paintGL() {
 //    glLoadIdentity();
 //    glRotatef(90,0,0,1);
 //    double arr1[] = {0,0,0,1,1,1,0,1,0};
-    glVertexPointer(3, GL_DOUBLE, 0, &arr);
+
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glColor3f(1.0, 1.0, 1.0);
-    glDrawArrays(GL_LINES, 0, countVertex-1);
+    glVertexPointer(3, GL_DOUBLE, 0, &arr);
+
+    glDrawArrays(GL_LINES, 0, countVertex/3);
+
+//    glDrawElements(GL_LINES, 10, GL_DOUBLE, &arr);
     glDisableClientState(GL_VERTEX_ARRAY);
     glRotatef(xRot, 1,0,0);
     glRotatef(yRot, 0,1,0);
 //        gluPerspective(60, 800.0/600.0, 2, 256);
+//    for (int i = 0; i < countVertex; i++) {
+//            printf("%lf\n", arr[i]);
+//    }
 
 }
 
@@ -67,42 +75,39 @@ void Widget::mouseMoveEvent(QMouseEvent *apEvent) {
 
 void Widget::initialPoints() {
     database matrix_of_vertex = {0};
-    char str[] = "models/Cube.obj";
+    char str[] = "models/City.obj";
     matrix_of_vertex = parser(str);
     array_of_coord(arr, matrix_of_vertex);
-    countVertex = matrix_of_vertex.count_polygons*3;
+    countVertex = matrix_of_vertex.count_polygons*18;
 
 //    printf("%lf\n", matrix_of_vertex.matrix_3d.matrix[1][1]);
-          s21_remove_matrix(&matrix_of_vertex.matrix_3d);
+    s21_remove_matrix(&matrix_of_vertex.matrix_3d);
 
     free_polygons(matrix_of_vertex);
 
-          memory_dealloc_polygon_t(matrix_of_vertex.polygons);
-          double max = 1;
+    memory_dealloc_polygon_t(matrix_of_vertex.polygons);
+    double max = 1;
 
-          for (int i = 0; i < countVertex; i++) {
-                if (arr[i] > max) {
-                    max = arr[i];
-                }
-          }
-          if (max > 1) {
-              while (max >= 1) {
-                  for (int i = 0; i < countVertex; i++) {
-                        arr[i] /= 2;
-                  }
-                  max /= 2;
-              }
-           }
-
-
+    for (int i = 0; i < countVertex; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    if (max > 1) {
+        while (max >= 1) {
+            for (int i = 0; i < countVertex; i++) {
+                arr[i] /= 2;
+            }
+            max /= 2;
+        }
+    }
 
 
 //          for (int i = 0; i < countVertex; i++) {
 //              arr[i] /=10;
 //          }
-//          for (int i = 0; i < matrix_of_vertex.count_polygons*3; i++) {
+//          for (int i = 0; i < matrix_of_vertex.count_polygons*6; i++) {
 //                  printf("%lf\n", arr[i]);
 //          }
-//          printf("COUNT%d\n", countVertex);
+    printf("COUNT%d\n", countVertex);
 }
-

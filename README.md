@@ -1,7 +1,7 @@
 
 # OBJ_3d_viewer
 
-![OBJ_3d_viewer](example/3dviewer.webm)
+![OBJ_3d_viewer](example/3dviewer.mp4)
 
 ## Introduction
 

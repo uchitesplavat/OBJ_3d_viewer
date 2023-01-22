@@ -1,7 +1,7 @@
 
 # OBJ_3d_viewer
 
-[Screencast from 2023-01-22 13-21-48.webm](https://user-images.githubusercontent.com/64572063/213910971-df3eef87-0bcd-45a5-a191-e467dc20cb0e.webm)
+[example.webm](https://user-images.githubusercontent.com/64572063/213911051-facc99b8-7497-43d4-99c0-a45620483835.webm)
 
 ## Introduction
 

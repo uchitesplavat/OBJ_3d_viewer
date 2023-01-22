@@ -1,7 +1,7 @@
 
 # OBJ_3d_viewer
 
-![OBJ_3d_viewer](example/3dviewer.mp4)
+[Screencast from 2023-01-22 13-21-48.webm](https://user-images.githubusercontent.com/64572063/213910971-df3eef87-0bcd-45a5-a191-e467dc20cb0e.webm)
 
 ## Introduction
 

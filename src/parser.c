@@ -12,8 +12,8 @@ double POWER_10_NEGATIVE[MAX_POWER] = {
     1.0e-14, 1.0e-15, 1.0e-16, 1.0e-17, 1.0e-18, 1.0e-19,
 };
 
-data parser(char* fileName) {
-  data d = {0};
+database parser(char* fileName) {
+  database d = {0};
   char* str = NULL;
   str = (memory_realloc(str, BUFFER_SIZE * sizeof(char)));
   char* tmp = str;
@@ -26,7 +26,7 @@ data parser(char* fileName) {
     printf("create matrix failed\n");
   } else {
     if ((file = file_open(fileName)) != NULL) {
-      unsigned long size = file_size(file);
+      //      unsigned long size = file_size(file);
       d.polygons = (memory_realloc(d.polygons,
                                    c.count_of_facets * 2 * sizeof(polygon_t)));
       int counter_polygons = 1;
@@ -112,7 +112,7 @@ char* parse_float_numbers_for_V(char* str, float* val) {
   return str;
 }
 
-data parse_vertex(char* str, struct data d, int index_string_number) {
+database parse_vertex(char* str, struct database d, int index_string_number) {
   unsigned int i;
   float v;
   str++;
@@ -123,7 +123,7 @@ data parse_vertex(char* str, struct data d, int index_string_number) {
   return d;
 }
 
-data case_F(char* str, struct data d, int counter_polygons) {
+database case_F(char* str, struct database d, int counter_polygons) {
   int count_vtn = 0;  // count v t n combination in one line
   ++str;
   str = skip_whitespace(str);
@@ -158,7 +158,7 @@ data case_F(char* str, struct data d, int counter_polygons) {
     } else {
       d.polygons[counter_polygons].tex[count_vtn] = 0;
     }
-    if (t < 0 || t > 0) {
+    if (n != 0) {
       d.polygons[counter_polygons].normals[count_vtn] = n;
     } else {
       d.polygons[counter_polygons].normals[count_vtn] = 0;
@@ -239,26 +239,26 @@ int s21_create_matrix(const int rows, matrix_t* result) {
 
 void* file_open(const char* path) { return fopen(path, "rb"); }
 
-size_t file_read(void* file, void* dst, size_t bytes) {
-  FILE* f;
-  f = (FILE*)(file);
-  return fread(dst, 1, bytes, f);
-}
+// size_t file_read(void* file, void* dst, size_t bytes) {
+//   FILE* f;
+//   f = (FILE*)(file);
+//   return fread(dst, 1, bytes, f);
+// }
 
-unsigned long file_size(void* file) {
-  FILE* f;
-  long p;
-  long n;
-  f = (FILE*)(file);
-  p = ftell(f);
-  fseek(f, 0, SEEK_END);
-  n = ftell(f);
-  fseek(f, p, SEEK_SET);
-  if (n > 0)
-    return (unsigned long)(n);
-  else
-    return 0;
-}
+// unsigned long file_size(void* file) {
+//   FILE* f;
+//   long p;
+//   long n;
+//   f = (FILE*)(file);
+//   p = ftell(f);
+//   fseek(f, 0, SEEK_END);
+//   n = ftell(f);
+//   fseek(f, p, SEEK_SET);
+//   if (n > 0)
+//     return (unsigned long)(n);
+//   else
+//     return 0;
+// }
 
 void file_close(void* file) {
   FILE* f;
@@ -309,7 +309,7 @@ void s21_remove_matrix(matrix_t* const A) {
   }
 }
 
-void free_polygons(struct data d) {
+void free_polygons(struct database d) {
   for (int k = 1; k < d.count_polygons + 1; k++) {
     memory_dealloc_int(d.polygons[k].vertexes);
     memory_dealloc_int(d.polygons[k].tex);
